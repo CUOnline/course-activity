@@ -299,7 +299,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.  */
           if (typeof fields[j].fmt !== 'undefined') {
             switch (fields[j].fmt) {
               case 'date':
-                value = excelDate(value);
+                value = value;
                 break;
               default:
                 break;
@@ -328,31 +328,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.  */
     }
     return t;
   }
-  function excelDate(timestamp) {
-    try {
-      if (!timestamp) {
-        return '';
-      }
-      timestamp = timestamp.replace('Z', '.000Z');
-      var dt = new Date(timestamp);
-      if (typeof dt !== 'object') {
-        return '';
-      }
-      var d = dt.getFullYear() + '-' +
-      pad(1 + dt.getMonth()) + '-' +
-      pad(dt.getDate()) + ' ' +
-      pad(dt.getHours()) + ':' +
-      pad(dt.getMinutes()) + ':' +
-      pad(dt.getSeconds());
-    }
-    catch (e) {
-      errorHandler(e);
-    }
-    return d;
-    function pad(n) {
-      return n < 10 ? '0' + n : n;
-    }
-  }
+
   function errorHandler(e) {
     console.log(e);
     alert(e.message);
