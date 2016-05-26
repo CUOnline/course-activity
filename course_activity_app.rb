@@ -32,6 +32,18 @@ class CourseActivityApp < WolfCore::App
       }
     end
 
+    def substitute_category(category)
+      substitutions = {
+        'wiki' => 'pages',
+        'topics' => 'discussions',
+        'roster' => 'people',
+        'pages' => 'group pages'
+      }
+
+      category = substitutions[category] if substitutions.keys.include?(category)
+      category.capitalize
+    end
+
     def update_item_data(data, row)
       data['Title'] ||= row["Title"]
 
@@ -71,8 +83,9 @@ class CourseActivityApp < WolfCore::App
   get '/' do
     @data = {}
     CSV.parse(URI.decode(params['accessData']), headers:true) do |row|
-      @data[row["Category"]] ||= {}
-      @data[row["Category"]] = update_category_data(@data[row["Category"]], row)
+      category = substitute_category(row["Category"])
+      @data[category] ||= {}
+      @data[category] = update_category_data(@data[category], row)
     end
 
     slim :index
