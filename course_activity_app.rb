@@ -8,6 +8,32 @@ class CourseActivityApp < WolfCore::App
   self.setup
 
   helpers do
+    def format_time(timestamp)
+      Time.parse(timestamp).strftime("%m/%d/%y %H:%M:%S")
+    end
+
+    def sort_link(field)
+      url = mount_point + '?sort='
+      if params['sort'] == field
+        url += "#{field}-desc"
+      else
+        url += field
+      end
+
+      url
+    end
+
+    def sort_class(field)
+      case params['sort']
+      when field
+        'glyphicon glyphicon-triangle-bottom'
+      when "#{field}-desc"
+        'glyphicon glyphicon-triangle-top'
+      else
+        ''
+      end
+    end
+
     def first_timestamp(data, row)
       current = Time.parse( data['First Access'] || Time.now.to_s )
       return current.to_s unless Time.parse(row['First Access']) < current
@@ -37,7 +63,8 @@ class CourseActivityApp < WolfCore::App
         'wiki' => 'pages',
         'topics' => 'discussions',
         'roster' => 'people',
-        'pages' => 'group pages'
+        'pages' => 'group pages',
+        'external_tools' => 'external tools'
       }
 
       category = substitutions[category] if substitutions.keys.include?(category)
