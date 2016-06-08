@@ -2,51 +2,62 @@ body, td, th {
   font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !important;
 }
 
-.shaded {
-  background-color: #f5f5f5;
-}
-
 table {
   width:100%;
 }
 
 th {
   text-align:center;
+  border-bottom: 1px solid #aaa;
+  padding-bottom: 3px;
 }
 
-.large_col {
-  width:30%;
-  padding-left: 5px;
+.category {
+  border-bottom: 2px solid #aaa;
+  height:60px;
+  font-size:1.5em;
+  font-weight:bold;
 }
-.med_col {
-  width:20%;
-  text-align: center;
+
+.category, .item {
+  cursor: pointer;
 }
-.small_col {
-  width:15%;
-  text-align: center;
+
+.category:hover, .item:hover {
+  background-color: #f5f5f5;
 }
 
 .glyphicon {
   font-size: .6em;
 }
 
-.category {
-  font-weight:bold;
-  font-size:1.5em;
-  height:60px;
-  border-bottom: 2px solid #aaa;
-  cursor: pointer;
-}
-
-.category:hover {
-  background-color: #f5f5f5;
-}
-
 .item > td {
   padding: 8px;
   border-top: 1px solid #aaa;
   border-bottom: 1px solid #aaa;
+}
+
+.large_col {
+  width:30%;
+  padding-left: 5px;
+}
+
+.med_col {
+  width:20%;
+  text-align: center;
+}
+
+.shaded {
+  background-color: #f5f5f5;
+}
+
+.shaded:hover {
+  background-color: #e5e5e5;
+}
+
+.small_col {
+  width:15%;
+  text-align: center;
 }
 
 .student > td {

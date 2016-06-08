@@ -6,7 +6,7 @@ table
         span [class='#{sort_class(header, params['sort'])}']
 
   -sorted_keys(@data, params['sort']).each_with_index do |key, i|
-    tr [class = 'category']
+    tr.category
       td.large_col
         span [class='glyphicon glyphicon-chevron-down'] &nbsp;
         | #{key}
