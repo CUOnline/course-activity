@@ -1,39 +1,42 @@
 table
   tr
-    -['name', 'views', 'participations', 'first-access', 'last-access'].each do |header|
+    -['name','views','participations','first_access','last_access'].each do |header|
       th
         a [href="#{sort_link(header)}"] #{header.gsub(/-/, ' ').capitalize} &nbsp;
-        span [class='#{sort_class(header)}']
+        span [class='#{sort_class(header, params['sort'])}']
 
-  -@data.each_with_index do |(category, stats), i|
+  -sorted_keys(@data, params['sort']).each_with_index do |key, i|
     tr [class = 'category']
       td.large_col
         span [class='glyphicon glyphicon-chevron-down'] &nbsp;
-        | #{category}
-      td.small_col #{stats['Total Views']}
-      td.small_col #{stats['Total Participations']}
-      td.med_col #{format_time(stats['First Access'])}
-      td.med_col #{format_time(stats['Last Access'])}
+        | #{key}
+      td.small_col #{@data[key]['views']}
+      td.small_col #{@data[key]['participations']}
+      td.med_col #{format_time(@data[key]['first_access'])}
+      td.med_col #{format_time(@data[key]['last_access'])}
 
     tr [style = 'display:none']
-      td.item_wrapper [colspan='5']
+      td [colspan='5']
         table
-          -stats["accesses"].each_with_index do |(code, data), i|
+          -i_data = @data[key]['accesses']
+          -sorted_keys(i_data, params['sort']).each_with_index do |i_key, i|
             tr [class='item #{'shaded' if i % 2 == 0} ']
               td.large_col
                 span [class='glyphicon glyphicon-triangle-bottom']
-                | &nbsp #{data['Title']}
-              td.small_col #{data['Total Views']}
-              td.small_col #{data['Total Participations']}
-              td.med_col #{format_time(data['First Access'])}
-              td.med_col #{format_time(data['Last Access'])}
-            tr[style = 'display:none;']
-              td[colspan='5']
+                | &nbsp #{i_data[i_key]['name']}
+              td.small_col #{i_data[i_key]['views']}
+              td.small_col #{i_data[i_key]['participations']}
+              td.med_col #{format_time(i_data[i_key]['first_access'])}
+              td.med_col #{format_time(i_data[i_key]['last_access'])}
+
+            tr [style = 'display:none;']
+              td [colspan='5']
                 table
-                  -data["accesses"].each_with_index do |student_access, j|
+                  -s_data = i_data[i_key]['accesses']
+                  -sorted_keys(s_data, params['sort']).each_with_index do |s_key, j|
                     tr [class='student #{'shaded' if j % 2 != (i % 2)}']
-                      td.large_col #{student_access['Display Name']}
-                      td.small_col #{student_access['Views']}
-                      td.small_col #{student_access['Participations']}
-                      td.med_col #{format_time(student_access['First Access'])}
-                      td.med_col #{format_time(student_access['Last Access'])}
+                      td.large_col #{s_data[s_key]['name']}
+                      td.small_col #{s_data[s_key]['views']}
+                      td.small_col #{s_data[s_key]['participations']}
+                      td.med_col #{format_time(s_data[s_key]['first_access'])}
+                      td.med_col #{format_time(s_data[s_key]['last_access'])}

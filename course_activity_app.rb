@@ -9,7 +9,7 @@ class CourseActivityApp < WolfCore::App
 
   helpers do
     def format_time(timestamp)
-      Time.parse(timestamp).strftime("%m/%d/%y %H:%M:%S")
+      Time.parse(timestamp).strftime('%m/%d/%y %H:%M')
     end
 
     def sort_link(field)
@@ -23,39 +23,41 @@ class CourseActivityApp < WolfCore::App
       url
     end
 
-    def sort_class(field)
-      case params['sort']
-      when field
-        'glyphicon glyphicon-triangle-bottom'
-      when "#{field}-desc"
-        'glyphicon glyphicon-triangle-top'
-      else
-        ''
+    def sort_class(header, sort_by)
+      case sort_by
+        when header
+          'glyphicon glyphicon-triangle-bottom'
+        when "#{header}-desc"
+          'glyphicon glyphicon-triangle-top'
+        else
+          ''
       end
     end
 
+    def sorted_keys(hash, sort_by='name')
+      sort_key, sort_order = sort_by.split('-')
+
+      sorted = hash.keys.sort_by do |k|
+        value = hash[k][sort_key] || k
+        value = Time.parse(value) if ['first-access', 'last-access'].include?(k)
+        value
+      end
+
+      sort_order == 'desc' ? sorted.reverse : sorted
+    end
+
     def first_timestamp(data, row)
-      current = Time.parse( data['First Access'] || Time.now.to_s )
+      current = Time.parse( data['first-access'] || Time.now.to_s )
       return current.to_s unless Time.parse(row['First Access']) < current
 
       row['First Access']
     end
 
     def last_timestamp(data, row)
-      current = Time.parse( data['Last Access'] || '1970-1-1' )
+      current = Time.parse( data['last-access'] || '1970-1-1' )
       return current.to_s unless Time.parse(row['Last Access']) > current
 
       row['Last Access']
-    end
-
-    def student_data(row)
-      {
-        'Display Name' => row["Display Name"],
-        'Views' => row['Views'] || 0,
-        'Participations' => row['Participations'] || 0,
-        'First Access' => row['First Access'],
-        'Last Access' => row['Last Access']
-      }
     end
 
     def substitute_category(category)
@@ -71,37 +73,41 @@ class CourseActivityApp < WolfCore::App
       category.capitalize
     end
 
+    def student_data(row)
+      {
+        'name' => row['Display Name'],
+        'views' => row['Views'].to_i || 0,
+        'participations' => row['Participations'].to_i || 0,
+        'first_access' => row['First Access'],
+        'last_access' => row['Last Access']
+      }
+    end
+
     def update_item_data(data, row)
-      data['Title'] ||= row["Title"]
-
-      data['Total Views'] ||= 0
-      data['Total Views'] += row['Views'].to_i || 0
-
-      data['Total Participations'] ||= 0
-      data['Total Participations'] += row['Participations'].to_i || 0
-
-      data['accesses'] ||= []
-      data['accesses'] << student_data(row)
-
-      data['First Access'] = first_timestamp(data, row)
-      data['Last Access'] = last_timestamp(data, row)
-
+      data = update_data(data, row)
+      data['name'] ||= row['Title']
+      data['accesses'][row['User ID']] ||= {}
+      data['accesses'][row['User ID']] = student_data(row)
       data
     end
 
     def update_category_data(data, row)
-      data['Total Views'] ||= 0
-      data['Total Views'] += row['Views'].to_i || 0
+      data = update_data(data, row)
+      data['accesses'][row['Code']] ||= {}
+      data['accesses'][row['Code']] = update_item_data(data['accesses'][row['Code']], row)
+      data
+    end
 
-      data['Total Participations'] ||= 0
-      data['Total Participations'] += row['Participations'].to_i || 0
+    def update_data(data, row)
+      data['views'] ||= 0
+      data['views'] += row['Views'].to_i || 0
 
+      data['participations'] ||= 0
+      data['participations'] += row['Participations'].to_i || 0
+
+      data['first_access'] = first_timestamp(data, row)
+      data['last_access'] = last_timestamp(data, row)
       data["accesses"] ||= {}
-      data["accesses"][row["Code"]] ||= {}
-      data["accesses"][row["Code"]] = update_item_data(data["accesses"][row["Code"]], row)
-
-      data['First Access'] = first_timestamp(data, row)
-      data['Last Access'] = last_timestamp(data, row)
 
       data
     end
