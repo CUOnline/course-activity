@@ -52,6 +52,38 @@ class CourseActivityApp < WolfCore::App
     slim :index
   end
 
+  post '/reload' do
+    csv_file = File.join(settings.tmp_dir, "access_data_#{params[:course_id]}")
+    File.delete(csv_file) if File.exists?(csv_file)
+
+    settings.redis.del("course:#{params[:course_id]}:access_data")
+    settings.redis.del("course:#{params['courseId']}:csv_data")
+    slim :reload
+  end
+
+  get '/download/:course_id' do
+    redis_key = "course:#{params[:course_id]}:csv_data"
+
+    if settings.redis.exists(redis_key)
+      csv_file = File.join(settings.tmp_dir, "access_data_#{params[:course_id]}.csv")
+      if !File.exists?(csv_file)
+        CSV.open(csv_file, 'w+') do |csv|
+          CSV.parse(settings.redis.get(redis_key)).each do |row|
+            csv << row
+          end
+        end
+      end
+      content_type 'text/csv'
+      send_file csv_file
+    else
+      slim :download
+    end
+  end
+
+  get '/check-data/:course_id' do
+    settings.redis.exists("course:#{params[:course_id]}:access_data") ? '1' : ''
+  end
+
   get '/access-report.js' do
     content_type 'application/javascript'
     erb 'access-report.js'.to_sym
