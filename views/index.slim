@@ -1,42 +1,57 @@
+h2
+  a [href='#{settings.canvas_url}/courses/#{params[:course_id]}']
+    | #{course_name('332889')}
+
+div#form-wrapper
+  form [action='#{mount_point}/download/#{params[:course_id]}' method='GET']
+    button [type='submit' class='btn btn-sm btn-primary' ] Download CSV
+
+  form [action='#{mount_point}/reload' method='POST']
+    input [type='hidden' name='course_id' value='#{params[:course_id]}']
+    button [type='submit' class='btn btn-sm btn-primary'] Reload data
+
+hr
+
 table
   tr
-    -['name','views','participations','first_access','last_access'].each do |header|
+    -['name','views','participations','first_access','last_access'].each_with_index do |header, i|
       th
-        a [href="#{sort_link(header)}"] #{header.gsub(/-/, ' ').capitalize} &nbsp;
+        - sort_link = sort_link(header, params['sort'], params['course_id'])
+        a [href="#{sort_link}"] #{header.gsub(/_/, ' ').capitalize} &nbsp;
         span [class='#{sort_class(header, params['sort'])}']
 
   -sorted_keys(@data, params['sort']).each_with_index do |key, i|
-    tr.category
-      td.large_col
+    tr [class='category #{'shaded' if i % 2 == 0}']
+      td
         span [class='glyphicon glyphicon-chevron-down'] &nbsp;
         | #{key}
-      td.small_col #{@data[key]['views']}
-      td.small_col #{@data[key]['participations']}
-      td.med_col #{format_time(@data[key]['first_access'])}
-      td.med_col #{format_time(@data[key]['last_access'])}
+      td #{@data[key]['views']}
+      td #{@data[key]['participations']}
+      td #{format_time(@data[key]['first_access'])}
+      td #{format_time(@data[key]['last_access'])}
 
     tr [style = 'display:none']
       td [colspan='5']
         table
           -i_data = @data[key]['accesses']
           -sorted_keys(i_data, params['sort']).each_with_index do |i_key, i|
-            tr [class='item #{'shaded' if i % 2 == 0} ']
-              td.large_col
+            tr [class='item #{'shaded' if i % 2 == 0}']
+              td
                 span [class='glyphicon glyphicon-triangle-bottom']
                 | &nbsp #{i_data[i_key]['name']}
-              td.small_col #{i_data[i_key]['views']}
-              td.small_col #{i_data[i_key]['participations']}
-              td.med_col #{format_time(i_data[i_key]['first_access'])}
-              td.med_col #{format_time(i_data[i_key]['last_access'])}
+              td #{i_data[i_key]['views']}
+              td #{i_data[i_key]['participations']}
+              td #{format_time(i_data[i_key]['first_access'])}
+              td #{format_time(i_data[i_key]['last_access'])}
 
-            tr [style = 'display:none;']
+            tr [style='display:none;']
               td [colspan='5']
                 table
                   -s_data = i_data[i_key]['accesses']
                   -sorted_keys(s_data, params['sort']).each_with_index do |s_key, j|
                     tr [class='student #{'shaded' if j % 2 != (i % 2)}']
-                      td.large_col #{s_data[s_key]['name']}
-                      td.small_col #{s_data[s_key]['views']}
-                      td.small_col #{s_data[s_key]['participations']}
-                      td.med_col #{format_time(s_data[s_key]['first_access'])}
-                      td.med_col #{format_time(s_data[s_key]['last_access'])}
+                      td #{s_data[s_key]['name']}
+                      td #{s_data[s_key]['views']}
+                      td #{s_data[s_key]['participations']}
+                      td #{format_time(s_data[s_key]['first_access'])}
+                      td #{format_time(s_data[s_key]['last_access'])}
