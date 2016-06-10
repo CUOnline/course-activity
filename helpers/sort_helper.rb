@@ -1,10 +1,10 @@
 module SortHelper
-  def sort_link(field)
-    url = mount_point + '?sort='
-    if params['sort'] == field
-      url += "#{field}-desc"
+  def sort_link(header, sort_by, course_id)
+    url = "#{mount_point}/course/#{course_id}?sort="
+    if sort_by == header
+      url += "#{header}-desc"
     else
-      url += field
+      url += header
     end
 
     url

@@ -1,4 +1,10 @@
 module DataHelper
+  def course_name(course_id)
+    q = "SELECT name FROM course_dim WHERE canvas_id = ?"
+    results = canvas_data(q, course_id)
+    results.first ? results.first["name"] : nil
+  end
+
   def substitute_category(category)
     substitutions = {
       'wiki' => 'pages',
