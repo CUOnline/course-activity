@@ -1,5 +1,7 @@
 require 'bundler/setup'
 require 'wolf_core'
+require 'wolf_core/auth'
+
 require 'csv'
 require 'time'
 
@@ -28,12 +30,13 @@ class CourseActivityApp < WolfCore::App
     else
       @data = {}
       begin
-        CSV.parse(URI.decode(params['csvData']), headers:true) do |row|
+        csv_string = URI.decode(params['csvData'])
+        CSV.parse(csv_string, headers:true) do |row|
           category = substitute_category(row['Category'])
           @data[category] ||= {}
           @data[category] = update_category_data(@data[category], row)
         end
-        settings.redis.set("course:#{params['courseId']}:csv_data", params['csvData'])
+        settings.redis.set("course:#{params['courseId']}:csv_data", csv_string)
         settings.redis.set(redis_key, @data.to_json)
       rescue CSV::MalformedCSVError
         status 400
@@ -53,11 +56,11 @@ class CourseActivityApp < WolfCore::App
   end
 
   post '/reload' do
-    csv_file = File.join(settings.tmp_dir, "access_data_#{params[:course_id]}")
+    csv_file = File.join(settings.tmp_dir, "access_data_#{params[:course_id]}.csv")
     File.delete(csv_file) if File.exists?(csv_file)
 
     settings.redis.del("course:#{params[:course_id]}:access_data")
-    settings.redis.del("course:#{params['courseId']}:csv_data")
+    settings.redis.del("course:#{params[:course_id]}:csv_data")
     slim :reload
   end
 
