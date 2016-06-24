@@ -202,8 +202,8 @@ requirejs(
         if (csv) {
           var params = { csvData: csv , courseId: courseId };
 
-          $.post( "https://<%= env['HTTP_HOST'] %><%= mount_point %>", params, function( data ) {
-            window.location = "https://<%= env['HTTP_HOST'] %><%= mount_point %>" + courseId;
+          $.post( "https://<%= env['HTTP_HOST'] %><%= mount_point %>/upload", params, function( data ) {
+            window.location = "https://<%= env['HTTP_HOST'] %><%= mount_point %>/course/" + courseId;
           });
         } else {
           throw new Error('Problem creating report');

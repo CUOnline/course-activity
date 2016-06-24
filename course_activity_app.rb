@@ -9,7 +9,7 @@ Dir["./helpers/*"].each {|f| require f }
 
 class CourseActivityApp < WolfCore::App
   set :root, File.dirname(__FILE__)
-  self.setup
+  set :views, ["#{root}/views", settings.base_views]
 
   set :public_paths, [/^\/upload$/, /^\/access-report.js$/, /^\/check-data\/\d+$/]
 

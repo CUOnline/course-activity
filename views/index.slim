@@ -1,6 +1,6 @@
 h2
   a [href='#{settings.canvas_url}/courses/#{params[:course_id]}']
-    | #{course_name('332889')}
+    | #{course_name(params[:course_id]) || ''}
 
 div#form-wrapper
   form [action='#{mount_point}/download/#{params[:course_id]}' method='GET']
