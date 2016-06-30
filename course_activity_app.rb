@@ -48,7 +48,7 @@ class CourseActivityApp < WolfCore::App
   get '/course/:course_id' do
     redis_key = "course:#{params[:course_id]}:access_data"
     if settings.redis.exists(redis_key)
-      @data = JSON.parse(settings.redis.get(redis_key))
+      @data = JSON.parse(settings.redis.get(redis_key).force_encoding('UTF-8'))
     else
       @data = {}
     end
@@ -71,7 +71,7 @@ class CourseActivityApp < WolfCore::App
       csv_file = File.join(settings.tmp_dir, "access_data_#{params[:course_id]}.csv")
       if !File.exists?(csv_file)
         CSV.open(csv_file, 'w+') do |csv|
-          CSV.parse(settings.redis.get(redis_key)).each do |row|
+          CSV.parse(settings.redis.get(redis_key).force_encoding('UTF-8')).each do |row|
             csv << row
           end
         end
