@@ -22,7 +22,15 @@ module SortHelper
   end
 
   def sorted_keys(hash, sort_by='name')
-    sort_key, sort_order = sort_by.split('-')
+    key_parts = sort_by.split('-')
+    if key_parts.length == 3
+      sort_order = key_parts.pop
+      sort_key = key_parts.join('-')
+    elsif ['first-access', 'last-access'].include?(sort_by)
+      sort_key = sort_by
+    else
+      sort_key, sort_order = key_parts
+    end
 
     sorted = hash.keys.sort_by do |k|
       value = hash[k][sort_key] || k

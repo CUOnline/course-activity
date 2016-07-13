@@ -32,7 +32,7 @@ class CourseActivityApp < WolfCore::App
       begin
         csv_string = URI.decode(params['csvData'])
         CSV.parse(csv_string, headers:true) do |row|
-          category = substitute_category(row['Category'])
+          category = substitute_category(row['Category'] || '')
           @data[category] ||= {}
           @data[category] = update_category_data(@data[category], row)
         end
