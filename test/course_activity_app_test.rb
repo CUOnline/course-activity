@@ -14,24 +14,6 @@ class StudentActivityAppTest < Minitest::Test
     @data_hash = {"Pages":{"views":4,"participations":0,"first_access":"2016-05-21T10:34:25Z","last_access":"2016-05-20T13:34:25Z","accesses":{"wiki_page_22222":{"views":4,"participations":0,"first_access":"2016-05-21T10:34:25Z","last_access":"2016-05-20T13:34:25Z","accesses":{"1234":{"name":" Name Namerson","views":1,"participations":0,"first_access":"2016-05-18T16:34:25Z","last_access":"2016-05-18T16:34:25Z"},"1235":{"name":" Student McStudentson","views":3,"participations":0,"first_access":"2016-05-21T10:34:25Z","last_access":"2016-05-20T13:34:25Z"}},"name":"Wiki Page"}}},"Quizzes":{"views":2,"participations":1,"first_access":"2016-06-02T14:11:11Z","last_access":"2016-06-02T12:11:11Z","accesses":{"quizzes:quiz_22222":{"views":2,"participations":1,"first_access":"2016-06-02T14:11:11Z","last_access":"2016-06-02T12:11:11Z","accesses":{"1235":{"name":" Student McStudentson","views":2,"participations":1,"first_access":"2016-06-02T14:11:11Z","last_access":"2016-06-02T12:11:11Z"}},"name":"Final Exam"}}}}
   end
 
-
-  def test_get_course_unauthenticated
-    get '/course/123'
-
-    assert_equal 302, last_response.status
-    follow_redirect!
-    assert_equal 'https://example.org/course-activity/auth?state=/course-activity/course-activity/auth', last_response.header['Location']
-  end
-
-  def test_get_download_unauthenticated
-    get "/download/123"
-
-    assert_equal 302, last_response.status
-    follow_redirect!
-    assert_equal 'https://example.org/course-activity/auth?state=/course-activity/course-activity/auth', last_response.header['Location']
-  end
-
-
   def test_get_script
     get '/access-report.js'
 
@@ -59,9 +41,25 @@ class StudentActivityAppTest < Minitest::Test
     assert_equal 200, last_response.status
   end
 
+  def test_get_course_unauthenticated
+    get '/course/123'
+
+    assert_equal 302, last_response.status
+    follow_redirect!
+    assert_equal '/canvas-auth-login', last_request.path
+  end
+
+  def test_get_course_unauthorized
+    login({'user_roles' => ['StudentEnrollment']})
+    get '/course/123'
+    assert_equal 302, last_response.status
+    follow_redirect!
+    assert_equal '/unauthorized', last_request.path
+  end
+
   def test_post_upload_initial
     course_id = '123'
-    params = {"courseId" => course_id, "csvData" => @csv_string}
+    params = {'courseId' => course_id, 'csvData' => @csv_string}
     app.settings.redis.expects(:exists).with("course:#{course_id}:access_data")
     app.settings.redis.expects(:set).with("course:#{course_id}:csv_data", @csv_string)
     app.settings.redis.expects(:set).with("course:#{course_id}:access_data", @data_hash.to_json)
@@ -73,7 +71,7 @@ class StudentActivityAppTest < Minitest::Test
 
   def test_post_upload_existing_data
     course_id = '123'
-    params = {"courseId" => course_id, "csvData" => @csv_string}
+    params = {'courseId' => course_id, 'csvData' => @csv_string}
     app.settings.redis.expects(:exists).with("course:#{course_id}:access_data")
                       .returns(true)
 
@@ -84,7 +82,7 @@ class StudentActivityAppTest < Minitest::Test
 
   def test_post_upload_invalid_csv
     course_id = '123'
-    params = {"courseId" => course_id, "csvData" => "Category,Views\ndata, \"data2\n"}
+    params = {'courseId' => course_id, 'csvData' => "Category,Views\ndata, \"data2\n"}
     app.settings.redis.expects(:exists).with("course:#{course_id}:access_data")
                                         .returns(false)
 
@@ -131,6 +129,22 @@ class StudentActivityAppTest < Minitest::Test
     assert !File.exists?(csv_file)
   end
 
+  def test_post_reload_unauthenticated
+    post '/reload/123'
+
+    assert_equal 302, last_response.status
+    follow_redirect!
+    assert_equal '/canvas-auth-login', last_request.path
+  end
+
+  def test_post_reload_unauthorized
+    login({'user_roles' => ['StudentEnrollment']})
+    post '/reload/123'
+    assert_equal 302, last_response.status
+    follow_redirect!
+    assert_equal '/unauthorized', last_request.path
+  end
+
   def test_get_download_no_data
     course_id = 123
     app.redis.expects(:exists).with("course:#{course_id}:csv_data").returns(false)
@@ -158,5 +172,21 @@ class StudentActivityAppTest < Minitest::Test
     assert_equal File.read(csv_file), @csv_string
 
     File.delete(csv_file)
+  end
+
+  def test_get_download_unauthenticated
+    get '/download/123'
+
+    assert_equal 302, last_response.status
+    follow_redirect!
+    assert_equal '/canvas-auth-login', last_request.path
+  end
+
+  def test_get_download_unauthorized
+    login({'user_roles' => ['StudentEnrollment']})
+    get '/download/123'
+    assert_equal 302, last_response.status
+    follow_redirect!
+    assert_equal '/unauthorized', last_request.path
   end
 end
