@@ -89,4 +89,29 @@ class CourseActivityApp < WolfCore::App
     content_type 'application/javascript'
     erb 'access-report.js'.to_sym
   end
+
+  get '/canvas-example.js' do
+    content_type 'application/javascript'
+    erb 'canvas-example.js'.to_sym, {
+      :locals => {
+        'scheme'=> request.env['rack.url_scheme'],
+        'domain'=> request.env['HTTP_HOST'],
+        'mount' => mount_point
+      }
+    }
+  end
+
+  get '/about' do
+    slim :about
+  end
+
+  # These filters are a hack to use the default wolf_core CSS for the about page,
+  # instead of the CourseActivityApp CSS which overrides it. Disable app-specific
+  # CSS before the request, re-enable in the after.
+  before '/about' do
+    CourseActivityApp.enable :exclude_css
+  end
+  after '/about' do
+    CourseActivityApp.disable :exclude_css
+  end
 end

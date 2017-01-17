@@ -1,0 +1,73 @@
+css:
+  #example-people {
+    margin-top: 0 !important;
+    width: 90%;
+  }
+
+  #example-theme {
+    margin-left: auto;
+    margin-right: auto;
+    width: 45%;
+  }
+
+  #example-javascript {
+    margin-left: auto;
+    margin-right: auto;
+    width: 20%;
+  }
+
+  hr {
+    margin-bottom: 10px;
+    margin-top:0px;
+  }
+
+  img {
+    display:block;
+    margin: 20px;
+  }
+
+
+h3 About
+hr
+p
+  | This tool provides takes the data from individual students' 
+  a [href='https://community.canvaslms.com/docs/DOC-2864', target='_blank'] access reports, 
+  | and aggregates them into a single, course-level report. It is an extension of 
+  a [href='https://community.canvaslms.com/docs/DOC-6061' target='_blank'] this tool, 
+  | providing a categorized, sortable interface, in addition to the data export functionality.
+
+h3 Usage
+hr
+p
+  | If already installed in your Canvas instance, you can access a usage data by going to a course's "People" page and selecting "Access Report Data" from the cog dropdown in the upper right corner.
+
+img#example-people [src='people-page-example.png']
+
+h3 Installation
+hr
+p
+  | This tool integrates with Canvas via custom javascript, rather than the traditional LTI integration.
+  | To make it available in Canvas, you'll need to add the javascript code found 
+  a [href='access-report.js', target='_blank'] here 
+  | to your Canvas instance's custom javascript.
+
+p
+  | To edit your instance's custom javascript, go to the main account page and select the "Themes" button on left-hand navigation bar. Open the current theme in the Theme Editor.
+
+  img#example-theme [src='theme-editor-example.png']
+
+  | From here you will find an option to upload a javascript file:
+  img#example-javascript [src='custom-javascript-example.png']
+
+p
+  | If a file is already uploaded (i.e. there is a "View File" link with existing content), be sure to include the existing content in your uploaded javascript file, or it will be overwritten and lost. The most straightforward way to add the needed code is to have your custom Canvas javascript load it directly from this site.
+
+p
+  a [href='canvas-example.js', target='_blank'] Here 
+  | is an example of javascript code that will achieve this.
+
+p
+  | Alternatively, you can copy & paste the entirety of 
+  a [href='access-report.js', target='_blank'] the code 
+  | iato your custom Canvas javascript. And lastly, if you would like to use the tool personally without enabling it for all Canvas users, you can run the script yourself using a tool like 
+  a [href='https://addons.mozilla.org/en-US/firefox/addon/greasemonkey' target='_blank'] Greasemonkey.
